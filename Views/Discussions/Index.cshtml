@@ -1,0 +1,34 @@
+﻿@model IEnumerable<AgriEnergyConnect.Models.DiscussionPost>
+@{
+    ViewData["Title"] = "Sustainable Farming Forum";
+}
+
+<h1>Sustainable Farming Forum</h1>
+<p>Welcome to the discussion forum for sustainable farming practices.</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Content</th>
+            <th>Farmer</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var post in Model)
+        {
+            <tr>
+                <td>@post.Title</td>
+                <td>@post.Content</td>
+                <td>@post.Farmer.Name</td>
+                <td>@post.CreatedDate.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (User.IsInRole("Farmer"))
+{
+    <p><a asp-action="Create" class="btn btn-primary">Create New Post</a></p>
+}

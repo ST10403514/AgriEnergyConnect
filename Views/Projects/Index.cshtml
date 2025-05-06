@@ -1,0 +1,29 @@
+﻿@model IEnumerable<AgriEnergyConnect.Models.ProjectProposal>
+@{
+    ViewData["Title"] = "Project Proposals";
+}
+
+<h1>Project Proposals</h1>
+<p><a asp-action="Create" class="btn btn-primary">Submit New Proposal</a></p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Farmer</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var proposal in Model)
+        {
+            <tr>
+                <td>@proposal.Title</td>
+                <td>@proposal.Description</td>
+                <td>@proposal.Farmer.Name</td>
+                <td>@proposal.CreatedDate.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>

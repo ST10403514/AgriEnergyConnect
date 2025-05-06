@@ -1,0 +1,27 @@
+﻿@model IEnumerable<AgriEnergyConnect.Models.Farmer>
+@{
+    ViewData["Title"] = "Farmer Management";
+}
+
+<h1>Farmer Management</h1>
+<p><a asp-action="Create" class="btn btn-primary">Add New Farmer</a></p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Address</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var farmer in Model)
+        {
+            <tr>
+                <td>@farmer.Name</td>
+                <td>@farmer.Email</td>
+                <td>@farmer.Address</td>
+            </tr>
+        }
+    </tbody>
+</table>

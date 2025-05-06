@@ -1,0 +1,64 @@
+﻿@model IEnumerable<AgriEnergyConnect.Models.Product>
+@{
+    ViewData["Title"] = "Green Energy Marketplace";
+}
+
+<h1>Green Energy Marketplace</h1>
+
+@if (User.IsInRole("Employee"))
+{
+    <form asp-action="Index" method="get">
+        <div class="row mb-3">
+            <div class="col">
+                <select name="farmerId" class="form-control">
+                    <option value="">All Farmers</option>
+                    @foreach (var farmer in ViewData["Farmers"] as List<AgriEnergyConnect.Models.Farmer>)
+                    {
+                        <option value="@farmer.Id" selected="@(ViewData["farmerId"]?.ToString() == farmer.Id.ToString() ? "selected" : null)">@farmer.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col">
+                <input type="text" name="category" class="form-control" placeholder="Category (e.g., Solar)" value="@ViewData["category"]" />
+            </div>
+            <div class="col">
+                <input type="number" name="minPrice" class="form-control" placeholder="Min Price" value="@ViewData["minPrice"]" />
+            </div>
+            <div class="col">
+                <input type="number" name="maxPrice" class="form-control" placeholder="Max Price" value="@ViewData["maxPrice"]" />
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+    </form>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Farmer</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Name</td>
+                <td>@product.Category</td>
+                <td>@product.Description</td>
+                <td>@product.Price.ToString("C")</td>
+                <td>@product.Farmer.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (User.IsInRole("Farmer"))
+{
+    <p><a asp-action="Create" class="btn btn-primary">Add New Product</a></p>
+}
