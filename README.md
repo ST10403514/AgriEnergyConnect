@@ -2,7 +2,7 @@
 
 AgriEnergyConnect is a web application that connects farmers, employees, and green energy experts to promote sustainable agriculture through a marketplace, discussion forum, project collaboration, funding opportunities, and educational resources. Built with ASP.NET Core and SQLite, it supports buying and selling eco-friendly products (e.g., biogas generators for R 3000), proposing sustainable projects, and sharing expertise.
 
-# Demo Video Link 
+## Demo Video Link 
 - [https://youtu.be/0O2hcYdxxfQ]
 
 ## Table of Contents
