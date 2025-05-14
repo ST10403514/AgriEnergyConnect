@@ -75,7 +75,7 @@ Follow these steps to set up the development environment:
 2. **Clone the Repository** (if using source control):
    - Run:
      ```
-     git clone <repository-url>
+     git clone <https://github.com/ST10403514/AgriEnergyConnect>
      cd AgriEnergyConnect
      ```
    - Alternatively, copy the project files to `C:\Users\<YourUsername>\source\repos\AgriEnergyConnect`.
@@ -157,17 +157,6 @@ Follow these steps to set up the development environment:
      - View funding opportunities at **Funding**.
      - Browse the marketplace and projects.
 
-### Capturing Screenshots for POE
-- **Home Page**: Capture `https://localhost:7220` as `homepage.png`.
-- **Marketplace**: Capture `/Products` as `marketplace.png`.
-- **Product Details**: Capture `/Products/Details/3` (with reviews) as `product_details.png`.
-- Add to your proposal:
-  ```markdown
-  ### Application Screenshots
-  ![Home Page](homepage.png)
-  ![Marketplace](marketplace.png)
-  ![Product Details](product_details.png)
-  ```
 
 ## Troubleshooting
 - **Database Errors** (e.g., “SQLite Error 19: 'UNIQUE constraint failed'”):
