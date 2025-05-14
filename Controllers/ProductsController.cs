@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using AgriEnergyConnect.Data;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AgriEnergyConnect.Controllers
 {
@@ -23,20 +24,30 @@ namespace AgriEnergyConnect.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index(string category = null, string sort = null)
+        public async Task<IActionResult> Index(string category = null, DateTime? startDate = null, DateTime? endDate = null, string sort = null)
         {
             var products = _context.Products
                 .Include(p => p.Farmer)
                 .Include(p => p.Reviews)
                 .AsQueryable();
 
+            // Apply filters
             if (!string.IsNullOrEmpty(category))
             {
                 products = products.Where(p => p.Category == category);
             }
+            if (startDate.HasValue)
+            {
+                products = products.Where(p => p.ProductionDate >= startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                products = products.Where(p => p.ProductionDate <= endDate.Value);
+            }
 
             var productList = await products.ToListAsync();
 
+            // Apply sorting
             if (sort == "price_asc")
             {
                 productList = productList.OrderBy(p => p.Price).ToList();
@@ -50,7 +61,11 @@ namespace AgriEnergyConnect.Controllers
                 productList = productList.OrderByDescending(p => p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : 0).ToList();
             }
 
-            ViewBag.Categories = await _context.Products.Select(p => p.Category).Distinct().ToListAsync();
+            // Populate categories for the filter dropdown
+            ViewBag.Categories = await _context.Products.Select(p => p.Category).Distinct()
+                .Select(c => new SelectListItem { Value = c, Text = c })
+                .ToListAsync();
+
             return View(productList);
         }
 
@@ -294,7 +309,7 @@ namespace AgriEnergyConnect.Controllers
                 _context.Add(review);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Review added successfully!";
+                TempData["ReviewSuccessMessage"] = "Review added successfully!";
                 return RedirectToAction(nameof(Details), new { id });
             }
             catch (Exception)
@@ -307,7 +322,7 @@ namespace AgriEnergyConnect.Controllers
         // POST: Products/PlaceOrder/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Farmer")]
+        [Authorize(Roles = "Farmer,Employee,GreenEnergyExpert")]
         public async Task<IActionResult> PlaceOrder(int id)
         {
             var product = await _context.Products
@@ -316,33 +331,28 @@ namespace AgriEnergyConnect.Controllers
 
             if (product == null)
             {
-                TempData["Error"] = "Product not found.";
+                TempData["ErrorMessage"] = "Product not found.";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null || string.IsNullOrEmpty(user.Email))
             {
-                TempData["Error"] = "User not authenticated or email missing.";
+                TempData["ErrorMessage"] = "User not authenticated or email missing.";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
             var farmer = await _context.Farmers
                 .FirstOrDefaultAsync(f => f.Email.ToLower() == user.Email.ToLower());
 
-            if (farmer == null)
+            // Allow non-Farmer roles (Employee, GreenEnergyExpert) to order without a Farmer profile
+            if (farmer != null && product.FarmerId == farmer.Id)
             {
-                TempData["Error"] = "No Farmer profile found for this user.";
+                TempData["ErrorMessage"] = "You cannot order your own product.";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
-            if (product.FarmerId == farmer.Id)
-            {
-                TempData["Error"] = "You cannot order your own product.";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            TempData["Success"] = "Order placed successfully!";
+            TempData["OrderSuccessMessage"] = "Order placed successfully!";
             return RedirectToAction(nameof(Details), new { id });
         }
     }
