@@ -2,22 +2,29 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AgriEnergyConnect.Data;
 using AgriEnergyConnect.Models;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders()
-    .AddDefaultUI();
+    options.UseSqlite(connectionString));
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseMigrationsEndPoint();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -25,8 +32,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
-app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -34,58 +42,36 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-// Seed roles and test users
+// Log database path
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+logger.LogInformation("Using SQLite database at: {DatabasePath}", connectionString);
+
+// Seed data
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
-    // Seed roles
-    string[] roles = new[] { "Farmer", "Employee" };
-    foreach (var role in roles)
+    var services = scope.ServiceProvider;
+    try
     {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        logger.LogInformation("Applying migrations...");
+        await context.Database.MigrateAsync(); // Replace EnsureCreated
+        logger.LogInformation("Migrations applied. Seeding data...");
+        await SeedData.Initialize(services);
+        logger.LogInformation("Seeding completed.");
+        var tables = await context.Database.SqlQueryRaw<string>("SELECT name FROM sqlite_master WHERE type='table'").ToListAsync();
+        logger.LogInformation("Tables: {Tables}", string.Join(", ", tables));
+        logger.LogInformation("Farmers: {Count}", await context.Farmers.CountAsync());
+        logger.LogInformation("Products: {Count}", await context.Products.CountAsync());
+        logger.LogInformation("Posts: {Count}", await context.DiscussionPosts.CountAsync());
+        logger.LogInformation("Comments: {Count}", await context.Comments.CountAsync());
+        logger.LogInformation("Projects: {Count}", await context.Projects.CountAsync());
+        logger.LogInformation("Funding Opportunities: {Count}", await context.FundingOpportunities.CountAsync());
+        logger.LogInformation("Users: {Count}", await context.Users.CountAsync());
     }
-
-    // Seed a test Farmer user
-    var farmerUser = await userManager.FindByEmailAsync("farmer@example.com");
-    if (farmerUser == null)
+    catch (Exception ex)
     {
-        farmerUser = new ApplicationUser
-        {
-            UserName = "farmer@example.com",
-            Email = "farmer@example.com",
-            Role = "Farmer"
-        };
-        await userManager.CreateAsync(farmerUser, "Farmer@123");
-        await userManager.AddToRoleAsync(farmerUser, "Farmer");
-
-        // Create a Farmer record
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        dbContext.Farmers.Add(new Farmer
-        {
-            Name = "Test Farmer",
-            Email = "farmer@example.com",
-            Address = "789 Farm Lane"
-        });
-        await dbContext.SaveChangesAsync();
-    }
-
-    // Seed a test Employee user
-    var employeeUser = await userManager.FindByEmailAsync("employee@example.com");
-    if (employeeUser == null)
-    {
-        employeeUser = new ApplicationUser
-        {
-            UserName = "employee@example.com",
-            Email = "employee@example.com",
-            Role = "Employee"
-        };
-        await userManager.CreateAsync(employeeUser, "Employee@123");
-        await userManager.AddToRoleAsync(employeeUser, "Employee");
+        logger.LogError(ex, "An error occurred seeding the DB.");
+        throw;
     }
 }
 

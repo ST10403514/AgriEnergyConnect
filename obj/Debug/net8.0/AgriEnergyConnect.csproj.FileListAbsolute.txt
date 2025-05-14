@@ -276,6 +276,7 @@ C:\Users\maceg\source\repos\AgriEnergyConnect\obj\Debug\net8.0\AgriEnergyConnect
 C:\Users\maceg\source\repos\AgriEnergyConnect\obj\Debug\net8.0\AgriEnergyConnect.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\maceg\source\repos\AgriEnergyConnect\obj\Debug\net8.0\AgriEnergyConnect.RazorAssemblyInfo.cache
 C:\Users\maceg\source\repos\AgriEnergyConnect\obj\Debug\net8.0\AgriEnergyConnect.RazorAssemblyInfo.cs
+C:\Users\maceg\source\repos\AgriEnergyConnect\obj\Debug\net8.0\AgriEnergyConnect.sourcelink.json
 C:\Users\maceg\source\repos\AgriEnergyConnect\obj\Debug\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\maceg\source\repos\AgriEnergyConnect\obj\Debug\net8.0\scopedcss\bundle\AgriEnergyConnect.styles.css
 C:\Users\maceg\source\repos\AgriEnergyConnect\obj\Debug\net8.0\scopedcss\projectbundle\AgriEnergyConnect.bundle.scp.css

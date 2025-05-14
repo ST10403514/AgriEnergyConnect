@@ -14,7 +14,11 @@ namespace AgriEnergyConnect.Data
         public DbSet<Farmer> Farmers { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<DiscussionPost> DiscussionPosts { get; set; }
-        public DbSet<ProjectProposal> ProjectProposals { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectCollaborator> ProjectCollaborators { get; set; }
+        public DbSet<FundingOpportunity> FundingOpportunities { get; set; }
+        public DbSet<ProductReview> ProductReviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -25,26 +29,63 @@ namespace AgriEnergyConnect.Data
                 .Property(p => p.Price)
                 .HasPrecision(18, 2);
 
-            // Seed sample data
-            builder.Entity<Farmer>().HasData(
-                new Farmer { Id = 1, Name = "John Doe", Email = "john@example.com", Address = "123 Farm Rd" },
-                new Farmer { Id = 2, Name = "Jane Smith", Email = "jane@example.com", Address = "456 Agri St" }
-            );
+            // Ensure Role is required
+            builder.Entity<ApplicationUser>()
+                .Property(u => u.Role)
+                .IsRequired();
 
-            builder.Entity<Product>().HasData(
-                new Product { Id = 1, FarmerId = 1, Name = "Solar Irrigation System", Category = "Solar", Description = "Efficient solar-powered irrigation", Price = 1500.00m },
-                new Product { Id = 2, FarmerId = 1, Name = "Farm Wind Turbine", Category = "Wind", Description = "Small-scale wind energy solution", Price = 5000.00m },
-                new Product { Id = 3, FarmerId = 2, Name = "Biogas Generator", Category = "Biogas", Description = "Converts waste to energy", Price = 3000.00m }
-            );
+            builder.Entity<Product>()
+              .HasOne(p => p.Farmer)
+              .WithMany()
+              .HasForeignKey(p => p.FarmerId)
+              .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<DiscussionPost>().HasData(
-                new DiscussionPost { Id = 1, FarmerId = 1, Title = "Organic Farming Tips", Content = "Sharing my experience with compost", CreatedDate = new DateTime(2025, 5, 1) },
-                new DiscussionPost { Id = 2, FarmerId = 2, Title = "Water Conservation", Content = "Drip irrigation success stories", CreatedDate = new DateTime(2025, 5, 2) }
-            );
+            builder.Entity<DiscussionPost>()
+                .HasOne(p => p.Farmer)
+                .WithMany()
+                .HasForeignKey(p => p.FarmerId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<ProjectProposal>().HasData(
-                new ProjectProposal { Id = 1, FarmerId = 1, Title = "Solar Farm Expansion", Description = "Seeking partners for solar panel installation", CreatedDate = new DateTime(2025, 5, 1) }
-            );
+            builder.Entity<Comment>()
+                .HasOne(c => c.Farmer)
+                .WithMany()
+                .HasForeignKey(c => c.FarmerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Comment>()
+                .HasOne(c => c.DiscussionPost)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(c => c.DiscussionPostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Project>()
+                .HasOne(p => p.Farmer)
+                .WithMany()
+                .HasForeignKey(p => p.FarmerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ProjectCollaborator>()
+                .HasKey(pc => new { pc.ProjectId, pc.FarmerId });
+
+            builder.Entity<ProjectCollaborator>()
+                .HasOne(pc => pc.Project)
+                .WithMany(p => p.Collaborators)
+                .HasForeignKey(pc => pc.ProjectId);
+
+            builder.Entity<ProjectCollaborator>()
+                .HasOne(pc => pc.Farmer)
+                .WithMany()
+                .HasForeignKey(pc => pc.FarmerId);
+
+            builder.Entity<ProductReview>()
+                .HasOne(pr => pr.Product)
+                .WithMany(p => p.Reviews)
+                .HasForeignKey(pr => pr.ProductId);
+
+            builder.Entity<ProductReview>()
+                .HasOne(pr => pr.Farmer)
+                .WithMany()
+                .HasForeignKey(pr => pr.FarmerId);
         }
     }
 }

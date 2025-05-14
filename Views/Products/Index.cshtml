@@ -1,64 +1,89 @@
 ﻿@model IEnumerable<AgriEnergyConnect.Models.Product>
 @{
-    ViewData["Title"] = "Green Energy Marketplace";
+    ViewData["Title"] = "Marketplace";
+    var categories = ViewBag.Categories as List<string>;
 }
 
-<h1>Green Energy Marketplace</h1>
+<div class="container my-5">
+    <h1 class="text-success">Marketplace</h1>
+    <p class="lead">Buy and sell agricultural products and green energy solutions.</p>
 
-@if (User.IsInRole("Employee"))
-{
-    <form asp-action="Index" method="get">
-        <div class="row mb-3">
-            <div class="col">
-                <select name="farmerId" class="form-control">
-                    <option value="">All Farmers</option>
-                    @foreach (var farmer in ViewData["Farmers"] as List<AgriEnergyConnect.Models.Farmer>)
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Filters and Sorting -->
+    <div class="mb-4">
+        <form asp-action="Index" method="get" class="d-flex gap-3 flex-wrap">
+            <div>
+                <label for="category" class="form-label">Category</label>
+                <select name="category" id="category" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    @if (categories != null)
                     {
-                        <option value="@farmer.Id" selected="@(ViewData["farmerId"]?.ToString() == farmer.Id.ToString() ? "selected" : null)">@farmer.Name</option>
+                        foreach (var cat in categories)
+                        {
+                            <option value="@cat" selected="@(cat == Context.Request.Query["category"])">@cat</option>
+                        }
                     }
                 </select>
             </div>
-            <div class="col">
-                <input type="text" name="category" class="form-control" placeholder="Category (e.g., Solar)" value="@ViewData["category"]" />
+            <div>
+                <label for="sort" class="form-label">Sort By</label>
+                <select name="sort" id="sort" class="form-select" onchange="this.form.submit()">
+                    <option value="">Default</option>
+                    <option value="price_asc" selected="@(Context.Request.Query["sort"] == "price_asc")">Price: Low to High</option>
+                    <option value="price_desc" selected="@(Context.Request.Query["sort"] == "price_desc")">Price: High to Low</option>
+                    <option value="rating" selected="@(Context.Request.Query["sort"] == "rating")">Average Rating</option>
+                </select>
             </div>
-            <div class="col">
-                <input type="number" name="minPrice" class="form-control" placeholder="Min Price" value="@ViewData["minPrice"]" />
-            </div>
-            <div class="col">
-                <input type="number" name="maxPrice" class="form-control" placeholder="Max Price" value="@ViewData["maxPrice"]" />
-            </div>
-            <div class="col">
-                <button type="submit" class="btn btn-primary">Filter</button>
-            </div>
-        </div>
-    </form>
-}
+        </form>
+    </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Farmer</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var product in Model)
+    <!-- Products -->
+    <div>
+        @if (User.IsInRole("Farmer"))
         {
-            <tr>
-                <td>@product.Name</td>
-                <td>@product.Category</td>
-                <td>@product.Description</td>
-                <td>@product.Price.ToString("C")</td>
-                <td>@product.Farmer.Name</td>
-            </tr>
+            <p><a asp-action="Create" class="btn btn-primary">List New Product</a></p>
         }
-    </tbody>
-</table>
-
-@if (User.IsInRole("Farmer"))
-{
-    <p><a asp-action="Create" class="btn btn-primary">Add New Product</a></p>
-}
+        <div class="row g-4">
+            @foreach (var product in Model)
+            {
+                <div class="col-md-6">
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <h5 class="card-title text-success">@product.Name</h5>
+                            <p class="card-text">@product.Description</p>
+                            <p class="card-text"><strong>Category:</strong> @product.Category</p>
+                            <p class="card-text"><strong>Price:</strong> R @product.Price</p>
+                            <p class="card-text"><strong>Seller:</strong> @product.Farmer?.Name</p>
+                            <p class="card-text"><strong>Rating:</strong> @(product.Reviews.Any() ? $"{product.Reviews.Average(r => r.Rating):F1}/5" : "No reviews")</p>
+                            <div class="d-flex gap-2">
+                                <a asp-action="Details" asp-route-id="@product.Id" class="btn btn-outline-success">View Details</a>
+                                @if (User.IsInRole("Farmer") && product.Farmer?.Email == User.Identity?.Name)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-outline-primary">Edit</a>
+                                    <form asp-action="Delete" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@product.Id" />
+                                        <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this product?')">Delete</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

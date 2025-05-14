@@ -1,29 +1,87 @@
-﻿@model IEnumerable<AgriEnergyConnect.Models.ProjectProposal>
+﻿@model IEnumerable<AgriEnergyConnect.Models.Project>
 @{
-    ViewData["Title"] = "Project Proposals";
+    ViewData["Title"] = "Collaboration Hub";
+    var fundingOpportunities = ViewBag.FundingOpportunities as List<AgriEnergyConnect.Models.FundingOpportunity>;
 }
 
-<h1>Project Proposals</h1>
-<p><a asp-action="Create" class="btn btn-primary">Submit New Proposal</a></p>
+<div class="container my-5">
+    <h1 class="text-success">Collaboration Hub</h1>
+    <p class="lead">Propose and join projects to innovate in sustainable agriculture and green energy. Explore funding opportunities to support your initiatives.</p>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Farmer</th>
-            <th>Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var proposal in Model)
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <!-- Funding Opportunities -->
+    <div class="mb-5">
+        <h2 class="text-success mb-4">Funding Opportunities</h2>
+        @if (fundingOpportunities != null && fundingOpportunities.Any())
         {
-            <tr>
-                <td>@proposal.Title</td>
-                <td>@proposal.Description</td>
-                <td>@proposal.Farmer.Name</td>
-                <td>@proposal.CreatedDate.ToShortDateString()</td>
-            </tr>
+            <div class="row g-4">
+                @foreach (var funding in fundingOpportunities)
+                {
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-body">
+                                <h5 class="card-title text-success">@funding.Title</h5>
+                                <p class="card-text">@funding.Description</p>
+                                <p class="card-text"><strong>Amount:</strong> R @funding.Amount</p>
+                                <p class="card-text"><strong>Source:</strong> @funding.Source</p>
+                                @if (!string.IsNullOrEmpty(funding.ApplicationUrl))
+                                {
+                                    <a href="@funding.ApplicationUrl" class="btn btn-outline-success" target="_blank">Apply Now</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
         }
-    </tbody>
-</table>
+        else
+        {
+            <p class="text-muted">No funding opportunities available at this time.</p>
+        }
+    </div>
+
+    <!-- Projects -->
+    <div>
+        <h2 class="text-success mb-4">Projects</h2>
+        @if (User.IsInRole("Farmer"))
+        {
+            <p><a asp-action="Create" class="btn btn-primary">Propose New Project</a></p>
+        }
+        <div class="row g-4">
+            @foreach (var project in Model)
+            {
+                <div class="col-md-6">
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <h5 class="card-title text-success">@project.Title</h5>
+                            <p class="card-text">@project.Description</p>
+                            <p class="card-text"><strong>Category:</strong> @project.Category</p>
+                            <p class="card-text"><strong>Funding Goal:</strong> R @project.FundingGoal</p>
+                            <p class="card-text"><strong>Status:</strong> @project.Status</p>
+                            <p class="card-text"><strong>Created by:</strong> @project.Farmer?.Name on @project.CreatedDate.ToString("MMM dd, yyyy")</p>
+                            <p class="card-text"><strong>Collaborators:</strong> @(project.Collaborators.Any() ? string.Join(", ", project.Collaborators.Select(c => c.Farmer.Name)) : "None")</p>
+                            <div class="d-flex gap-2">
+                                <a asp-action="Details" asp-route-id="@project.Id" class="btn btn-outline-success">View Details</a>
+                                @if (project.Status == "Open" && (User.IsInRole("Farmer") || User.IsInRole("GreenEnergyExpert")))
+                                {
+                                    <form asp-action="Join" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@project.Id" />
+                                        <button type="submit" class="btn btn-outline-primary">Join Project</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

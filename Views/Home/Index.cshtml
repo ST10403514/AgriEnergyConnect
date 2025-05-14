@@ -1,8 +1,117 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model dynamic
+@{
+    ViewData["Title"] = "AgriEnergyConnect";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Hero Section -->
+<div class="container my-5">
+    <div class="text-center">
+        <h1 class="display-4 text-success">Welcome to AgriEnergyConnect</h1>
+        <p class="lead">Connecting farmers, employees, and green energy experts to drive sustainable agriculture through innovative products and collaboration.</p>
+        @if (User.Identity.IsAuthenticated)
+        {
+            @if (User.IsInRole("Farmer"))
+            {
+                <p>As a farmer, sell eco-friendly products like biogas generators (R 3000) and propose sustainable projects.</p>
+                
+            }
+            else if (User.IsInRole("Employee"))
+            {
+                <p>Manage farmer profiles and review sustainable products in our marketplace.</p>
+                
+            }
+            else if (User.IsInRole("GreenEnergyExpert"))
+            {
+                <p>Share expertise in our forum and evaluate funding opportunities.</p>
+                
+            }
+        }
+        else
+        {
+            <p>Join our community to buy, sell, and discuss sustainable agriculture solutions.</p>
+           
+        }
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container mb-5">
+    <h2 class="text-center mb-4">Our Features</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">Marketplace</h5>
+                    <p class="card-text">Buy and sell sustainable products like solar irrigation systems and biogas generators. Leave star ratings (★★★★☆) to share feedback.</p>
+                    @if (User.IsInRole("Employee") || User.IsInRole("GreenEnergyExpert"))
+                    {
+                        
+                    }
+                    else if (User.IsInRole("Farmer"))
+                    {
+                        
+                    }
+                    else
+                    {
+                       
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">Farmer Management</h5>
+                    <p class="card-text">Employees manage farmer profiles to support our sustainable community.</p>
+                    @if (User.IsInRole("Employee"))
+                    {
+                        
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">Discussion Forum</h5>
+                    <p class="card-text">Discuss organic farming, water conservation, and green energy with experts and farmers.</p>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">Project Collaboration</h5>
+                    <p class="card-text">Farmers propose projects like solar irrigation systems for community support.</p>
+                    @if (User.IsInRole("Farmer"))
+                    {
+                        
+                    }
+                    else
+                    {
+                        
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">Funding Opportunities</h5>
+                    <p class="card-text">Explore grants like the Green Farming Grant to fund sustainable initiatives.</p>
+                   
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">Education Hub</h5>
+                    <p class="card-text">Learn about sustainable agriculture and green energy solutions.</p>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,0 +1,57 @@
+﻿@model AgriEnergyConnect.Models.Project
+@{
+    ViewData["Title"] = "Project Details";
+    var fundingOpportunities = ViewBag.FundingOpportunities as List<AgriEnergyConnect.Models.FundingOpportunity>;
+}
+
+<div class="container my-5">
+    <h1 class="text-success">Project Details</h1>
+    <div class="card border-success mb-5">
+        <div class="card-body">
+            <h5 class="card-title text-success">@Model.Title</h5>
+            <p class="card-text">@Model.Description</p>
+            <p class="card-text"><strong>Category:</strong> @Model.Category</p>
+            <p class="card-text"><strong>Funding Goal:</strong> R @Model.FundingGoal</p>
+            <p class="card-text"><strong>Status:</strong> @Model.Status</p>
+            <p class="card-text"><strong>Created by:</strong> @Model.Farmer?.Name on @Model.CreatedDate.ToString("MMM dd, yyyy")</p>
+            <p class="card-text"><strong>Collaborators:</strong> @(Model.Collaborators.Any() ? string.Join(", ", Model.Collaborators.Select(c => c.Farmer.Name)) : "None")</p>
+            @if (Model.Status == "Open" && (User.IsInRole("Farmer") || User.IsInRole("GreenEnergyExpert")))
+            {
+                <form asp-action="Join" method="post" class="d-inline">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-outline-primary">Join Project</button>
+                </form>
+            }
+            <a asp-action="Index" class="btn btn-outline-success mt-2">Back to Projects</a>
+        </div>
+    </div>
+
+    <!-- Funding Opportunities -->
+    <h2 class="text-success mb-4">Recommended Funding Opportunities</h2>
+    @if (fundingOpportunities != null && fundingOpportunities.Any())
+    {
+        <div class="row g-4">
+            @foreach (var funding in fundingOpportunities)
+            {
+                <div class="col-md-6">
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <h5 class="card-title text-success">@funding.Title</h5>
+                            <p class="card-text">@funding.Description</p>
+                            <p class="card-text"><strong>Amount:</strong> R @funding.Amount</p>
+                            <p class="card-text"><strong>Source:</strong> @funding.Source</p>
+                            @if (!string.IsNullOrEmpty(funding.ApplicationUrl))
+                            {
+                                <a href="@funding.ApplicationUrl" class="btn btn-outline-success" target="_blank">Apply Now</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">No funding opportunities available at this time.</p>
+    }
+</div>

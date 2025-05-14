@@ -1,17 +1,21 @@
 ﻿@model IEnumerable<AgriEnergyConnect.Models.Farmer>
 @{
-    ViewData["Title"] = "Farmer Management";
+    ViewData["Title"] = "Farmers";
 }
 
-<h1>Farmer Management</h1>
+<h1>Farmers</h1>
 <p><a asp-action="Create" class="btn btn-primary">Add New Farmer</a></p>
-
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Name</th>
             <th>Email</th>
             <th>Address</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -21,6 +25,10 @@
                 <td>@farmer.Name</td>
                 <td>@farmer.Email</td>
                 <td>@farmer.Address</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@farmer.Id" class="btn btn-sm btn-primary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@farmer.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
             </tr>
         }
     </tbody>

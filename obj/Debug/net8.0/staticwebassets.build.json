@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "GmtV0t/ZP2aW/bwypyVv3hL9drzrOLELAAsCZzWIx/0=",
+  "Hash": "jPpUmZfhKCXqRvV5NkMPnqs8vmJ1e633uv9T16RBMrw=",
   "Source": "AgriEnergyConnect",
   "BasePath": "_content/AgriEnergyConnect",
   "Mode": "Default",
@@ -1333,8 +1333,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "c2tiyv64ts",
-      "Integrity": "pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=",
+      "Fingerprint": "02v2ly0pw8",
+      "Integrity": "SLllar2welGUNzOKrBSQgfKVgjY6oQ3/6P/HubVUEkM=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
@@ -2603,7 +2603,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 06 May 2025 08:30:15 GMT"
+          "Value": "Wed, 14 May 2025 15:17:21 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2640,7 +2640,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 06 May 2025 08:30:15 GMT"
+          "Value": "Wed, 14 May 2025 15:17:21 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2677,7 +2677,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 06 May 2025 08:30:15 GMT"
+          "Value": "Wed, 14 May 2025 15:17:21 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2722,7 +2722,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 06 May 2025 08:30:15 GMT"
+          "Value": "Wed, 14 May 2025 15:17:21 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2745,7 +2745,7 @@
       ]
     },
     {
-      "Route": "css/site.c2tiyv64ts.css",
+      "Route": "css/site.02v2ly0pw8.css",
       "AssetFile": "C:\\Users\\maceg\\source\\repos\\AgriEnergyConnect\\wwwroot\\css\\site.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -2755,7 +2755,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "362"
+          "Value": "688"
         },
         {
           "Name": "Content-Type",
@@ -2763,11 +2763,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=\""
+          "Value": "\"SLllar2welGUNzOKrBSQgfKVgjY6oQ3/6P/HubVUEkM=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 06 May 2025 07:58:29 GMT"
+          "Value": "Tue, 06 May 2025 19:24:34 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2777,7 +2777,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "c2tiyv64ts"
+          "Value": "02v2ly0pw8"
         },
         {
           "Name": "label",
@@ -2785,7 +2785,7 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0="
+          "Value": "sha256-SLllar2welGUNzOKrBSQgfKVgjY6oQ3/6P/HubVUEkM="
         }
       ]
     },
@@ -2800,7 +2800,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "362"
+          "Value": "688"
         },
         {
           "Name": "Content-Type",
@@ -2808,11 +2808,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=\""
+          "Value": "\"SLllar2welGUNzOKrBSQgfKVgjY6oQ3/6P/HubVUEkM=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 06 May 2025 07:58:29 GMT"
+          "Value": "Tue, 06 May 2025 19:24:34 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2822,7 +2822,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0="
+          "Value": "sha256-SLllar2welGUNzOKrBSQgfKVgjY6oQ3/6P/HubVUEkM="
         }
       ]
     },

@@ -2,18 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using AgriEnergyConnect.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using AgriEnergyConnect.Data;
 
@@ -23,20 +18,20 @@ namespace AgriEnergyConnect.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IUserStore<ApplicationUser> _userStore;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly ApplicationDbContext _context;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
-            IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole> roleManager,
             ILogger<RegisterModel> logger,
             ApplicationDbContext context)
         {
             _userManager = userManager;
-            _userStore = userStore;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _logger = logger;
             _context = context;
         }
@@ -46,24 +41,20 @@ namespace AgriEnergyConnect.Areas.Identity.Pages.Account
 
         public string ReturnUrl { get; set; }
 
-        public IList<AuthenticationScheme> ExternalLogins { get; set; }
-
         public class InputModel
         {
             [Required]
-            [EmailAddress]
-            [Display(Name = "Email")]
-            public string Email { get; set; }
-
-            [Required]
-            [StringLength(100)]
             [Display(Name = "Name")]
             public string Name { get; set; }
 
             [Required]
-            [StringLength(200)]
             [Display(Name = "Address")]
             public string Address { get; set; }
+
+            [Required]
+            [EmailAddress]
+            [Display(Name = "Email")]
+            public string Email { get; set; }
 
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
@@ -80,28 +71,27 @@ namespace AgriEnergyConnect.Areas.Identity.Pages.Account
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser
-                {
-                    UserName = Input.Email,
-                    Email = Input.Email,
-                    Role = "Farmer"
-                };
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, Role = "Farmer" };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    // Create a Farmer record
+                    // Ensure Farmer role exists
+                    if (!await _roleManager.RoleExistsAsync("Farmer"))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole("Farmer"));
+                    }
+                    await _userManager.AddToRoleAsync(user, "Farmer");
+
+                    // Create Farmer profile
                     var farmer = new Farmer
                     {
                         Name = Input.Name,
@@ -111,17 +101,16 @@ namespace AgriEnergyConnect.Areas.Identity.Pages.Account
                     _context.Farmers.Add(farmer);
                     await _context.SaveChangesAsync();
 
-                    // Assign Farmer role
-                    await _userManager.AddToRoleAsync(user, "Farmer");
-
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return LocalRedirect(returnUrl);
+                    return LocalRedirect("~/");
                 }
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
+
+            // If we got this far, something failed, redisplay form
             return Page();
         }
     }
